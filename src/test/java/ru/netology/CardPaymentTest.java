@@ -1,9 +1,8 @@
 package ru.netology;
 
-import com.github.javafaker.Faker;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.codeborne.selenide.logevents.SelenideLogger;
+import io.qameta.allure.selenide.AllureSelenide;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -11,8 +10,6 @@ import ru.netology.data.DataBaseManager;
 import ru.netology.data.DataGenerator;
 import ru.netology.data.DataHelper;
 import ru.netology.page.PaymentPage;
-
-import java.util.Locale;
 
 import static com.codeborne.selenide.Selenide.open;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -47,6 +44,16 @@ public class CardPaymentTest {
         return DataGenerator.invalidSymbolsTestDataSet(lengthCVVcodeField);
     }
 
+    @BeforeAll
+    static void setUpAll() {
+        SelenideLogger.addListener("allure", new AllureSelenide());
+    }
+
+    @AfterAll
+    static void tearDownAll() {
+        SelenideLogger.removeListener("allure");
+    }
+
     @BeforeEach
     void setUp() {
         open("http://localhost:8080");
@@ -57,8 +64,9 @@ public class CardPaymentTest {
         PaymentPage page = new PaymentPage(formForPayment);
         page.approvedPaymentCard(DataHelper.getApprovedCardInfo());
         String[] expectedData = new String[]{amountDB, statusApproveDB};
+        String[] actualData = DataBaseManager.getAmountAndStatusPaymentTransaction();
 
-        assertArrayEquals(expectedData, DataBaseManager.getAmountAndStatusPaymentTransaction());
+        assertArrayEquals(expectedData, actualData);
     }
 
     @Test
