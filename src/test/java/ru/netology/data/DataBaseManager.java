@@ -5,13 +5,16 @@ import lombok.SneakyThrows;
 import java.sql.DriverManager;
 
 public class DataBaseManager {
+    public static String urlDB = "jdbc:mysql://localhost:3306/app";
+    public static String userDB = "app";
+    public static String passwordDB = "pass";
     @SneakyThrows
     public static String[] getAmountAndStatusPaymentTransaction() {
         String[] amountAndStatusPaymentTransaction = null;
         String request = "SELECT amount, status FROM payment_entity ORDER BY created DESC LIMIT 1;";
         try (
                 var conn = DriverManager
-                        .getConnection("jdbc:mysql://localhost:3306/app", "app", "pass");
+                        .getConnection(urlDB, userDB, passwordDB);
                 var getAmountAndStatus = conn.prepareStatement(request)
         ) {
             try (var amountAndStatus = getAmountAndStatus.executeQuery()) {
@@ -32,7 +35,7 @@ public class DataBaseManager {
         String request = "SELECT status FROM credit_request_entity ORDER BY created DESC LIMIT 1;";
         try (
                 var conn = DriverManager
-                        .getConnection("jdbc:mysql://localhost:3306/app", "app", "pass");
+                        .getConnection(urlDB, userDB, passwordDB);
                 var getStatus = conn.prepareStatement(request)
         ) {
             try (var status = getStatus.executeQuery()) {
